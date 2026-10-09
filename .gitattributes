@@ -1,0 +1,7 @@
+# Los scripts Bash deben tener finales de línea LF aunque se clonen en Windows
+# (con CRLF fallan en macOS/Linux/WSL con "bad interpreter" o "$'\r': command not found").
+*.sh   text eol=lf
+*.ps1  text eol=crlf
+*.yaml text eol=lf
+*.tf   text eol=lf
+*.md   text eol=lf
