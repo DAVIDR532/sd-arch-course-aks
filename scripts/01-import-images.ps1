@@ -29,10 +29,29 @@ $images = @(
     @{ Source = "ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.112.0";    Target = "documentdb/documentdb-local:pg17-0.112.0" }
 )
 
+function Test-AcrTag([string]$Target) {
+    $repo, $tag = $Target -split ':', 2
+    $tags = az acr repository show-tags --name $AcrName --repository $repo -o tsv 2>$null
+    return ($LASTEXITCODE -eq 0 -and ($tags -contains $tag))
+}
+
 foreach ($img in $images) {
     Write-Step "Importando $($img.Source) -> $AcrName.azurecr.io/$($img.Target)"
-    az acr import --name $AcrName --source $img.Source --image $img.Target --force --only-show-errors
-    if ($LASTEXITCODE -ne 0) { throw "Falló la importación de $($img.Source)" }
+    $done = $false
+    for ($attempt = 1; $attempt -le 3 -and -not $done; $attempt++) {
+        az acr import --name $AcrName --source $img.Source --image $img.Target --force --only-show-errors
+        # Docker Hub limita descargas anónimas (HTTP 429). A veces az reporta error
+        # pero el ACR completa la importación reintentando: verificamos el tag.
+        $done = ($LASTEXITCODE -eq 0) -or (Test-AcrTag $img.Target)
+        if (-not $done -and $attempt -lt 3) {
+            Write-Host "Reintentando en 60s (intento $attempt de 3)..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 60
+        }
+    }
+    if (-not $done) {
+        throw "Falló la importación de $($img.Source). Si es un 429 de Docker Hub, usa el mirror " +
+              "public.ecr.aws/docker/library/<imagen> o importa con credenciales (--username/--password)."
+    }
 }
 
 Write-Step "Repositorios en el ACR"

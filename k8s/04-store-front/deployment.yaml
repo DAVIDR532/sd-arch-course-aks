@@ -51,10 +51,12 @@ spec:
           # en paralelo con la señal de apagado. Esperar unos segundos antes de
           # detener nginx evita que el Load Balancer le envíe peticiones a un pod
           # que ya cerró (sin esto se observan errores puntuales en cada rollout).
+          # (Desde K8s 1.30 existe `preStop.sleep`, pero kubectl < 1.30 lo descarta
+          #  al hacer `rollout undo`; `exec` funciona con cualquier versión.)
           lifecycle:
             preStop:
-              sleep:
-                seconds: 10
+              exec:
+                command: ["sh", "-c", "sleep 10"]
           resources:
             # Personalizado: el original pide 1m de CPU; subimos a 50m para que
             # el HPA calcule un % de uso realista (ver hpa.yaml).

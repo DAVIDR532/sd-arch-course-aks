@@ -82,7 +82,8 @@ try {
 Start-Sleep -Seconds 3
 $queueAfter = kubectl exec -n $Namespace rabbitmq-0 -c rabbitmq -- rabbitmqctl list_queues name messages --quiet 2>$null
 $hasQueue = ($queueAfter | Select-String -Pattern '^orders\s') -ne $null
-Add-Result 'Cola "orders" en RabbitMQ' $hasQueue ("antes: [" + (($queueBefore | Select-String '^orders') -join '') + "] después: [" + (($queueAfter | Select-String '^orders') -join '') + "]")
+$note = if (kubectl get deploy makeline-service -n $Namespace --ignore-not-found -o name) { ' (makeline-service consume la cola, puede quedar en 0)' } else { '' }
+Add-Result 'Cola "orders" en RabbitMQ' $hasQueue ("antes: [" + (($queueBefore | Select-String '^orders') -join '') + "] después: [" + (($queueAfter | Select-String '^orders') -join '') + "]" + $note)
 
 Write-Step "6. Backoffice (si está desplegado)"
 $hasAdmin = kubectl get svc store-admin -n $Namespace --ignore-not-found -o name
