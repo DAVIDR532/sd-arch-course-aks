@@ -1,0 +1,39 @@
+# Simulador: genera pedidos automáticamente contra order-service.
+# Útil para ver la cola llenarse y el sistema "vivo" durante la clase.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virtual-customer
+  namespace: aks-store
+  labels:
+    app: virtual-customer
+    app.kubernetes.io/part-of: aks-store
+    app.kubernetes.io/component: simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: virtual-customer
+  template:
+    metadata:
+      labels:
+        app: virtual-customer
+        app.kubernetes.io/part-of: aks-store
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: virtual-customer
+          image: __ACR_LOGIN_SERVER__/aks-store-demo/virtual-customer:2.2.0
+          env:
+            - name: ORDER_SERVICE_URL
+              value: http://order-service:3000/
+            - name: ORDERS_PER_HOUR
+              value: "100"
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+            limits:
+              cpu: 2m
+              memory: 20Mi

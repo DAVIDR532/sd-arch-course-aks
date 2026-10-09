@@ -1,0 +1,20 @@
+# SERVICE LoadBalancer: en AKS esto crea automáticamente una IP PÚBLICA y
+# una regla en el Azure Standard Load Balancer (dentro del node resource group).
+# Es la forma más simple de exponer una app; en producción se usa un
+# Ingress / Application Gateway for Containers / App Routing con TLS + WAF.
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-front
+  namespace: aks-store
+  labels:
+    app: store-front
+    app.kubernetes.io/part-of: aks-store
+spec:
+  type: LoadBalancer
+  selector:
+    app: store-front
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

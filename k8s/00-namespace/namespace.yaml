@@ -1,0 +1,10 @@
+# NAMESPACE: frontera lógica dentro del cluster.
+# Agrupa los objetos de una app/equipo y permite aplicarles cuotas,
+# permisos (RBAC) y network policies de forma aislada.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aks-store
+  labels:
+    app.kubernetes.io/part-of: aks-store
+    course: smartdata-az305

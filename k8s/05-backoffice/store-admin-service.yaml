@@ -1,0 +1,18 @@
+# Expuesto con IP pública solo para el demo. Un portal administrativo real
+# debería ser interno (LoadBalancer interno / Private Link / VPN) o protegido con Entra ID.
+apiVersion: v1
+kind: Service
+metadata:
+  name: store-admin
+  namespace: aks-store
+  labels:
+    app: store-admin
+    app.kubernetes.io/part-of: aks-store
+spec:
+  type: LoadBalancer
+  selector:
+    app: store-admin
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8081

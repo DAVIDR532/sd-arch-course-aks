@@ -1,0 +1,22 @@
+# SERVICE ClusterIP: IP virtual + nombre DNS interno estable.
+# Los demás pods se conectan a "rabbitmq:5672" (o rabbitmq.aks-store.svc.cluster.local)
+# sin importar en qué nodo ni con qué IP esté corriendo el pod.
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: aks-store
+  labels:
+    app: rabbitmq
+    app.kubernetes.io/part-of: aks-store
+spec:
+  type: ClusterIP
+  selector:
+    app: rabbitmq
+  ports:
+    - name: rabbitmq-amqp
+      port: 5672
+      targetPort: 5672
+    - name: rabbitmq-http
+      port: 15672
+      targetPort: 15672

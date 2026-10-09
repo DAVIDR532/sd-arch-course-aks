@@ -1,0 +1,56 @@
+# DEPLOYMENT: declara el ESTADO DESEADO ("quiero N réplicas de esta imagen").
+# Kubernetes crea un ReplicaSet que mantiene los pods vivos y hace
+# rolling updates cuando cambia la plantilla (por ejemplo, la imagen).
+#
+# product-service (Rust): catálogo de productos -> GET /
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: aks-store
+  labels:
+    app: product-service
+    app.kubernetes.io/part-of: aks-store
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+        app.kubernetes.io/part-of: aks-store
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: product-service
+          image: __ACR_LOGIN_SERVER__/aks-store-demo/product-service:2.2.0
+          ports:
+            - containerPort: 3002
+          env:
+            - name: AI_SERVICE_URL
+              value: "http://ai-service:5001/"
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+            limits:
+              cpu: 2m
+              memory: 20Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            failureThreshold: 5
+            initialDelaySeconds: 3
+            periodSeconds: 3

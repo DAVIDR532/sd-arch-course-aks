@@ -1,0 +1,64 @@
+# STATEFULSET: como un Deployment, pero para cargas con identidad estable
+# (nombre fijo rabbitmq-0, orden de arranque, volúmenes por réplica).
+# Se usa para bases de datos y brokers de mensajería.
+# (Demo: sin volumen persistente -> si el pod se reinicia, la cola se pierde.)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: aks-store
+  labels:
+    app: rabbitmq
+    app.kubernetes.io/part-of: aks-store
+    app.kubernetes.io/component: messaging
+spec:
+  serviceName: rabbitmq
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        app.kubernetes.io/part-of: aks-store
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: rabbitmq
+          # Imagen importada al ACR privado (ver scripts/01-import-images.ps1)
+          image: __ACR_LOGIN_SERVER__/library/rabbitmq:4.3.2-management-alpine
+          ports:
+            - containerPort: 5672
+              name: rabbitmq-amqp
+            - containerPort: 15672
+              name: rabbitmq-http
+          envFrom:
+            - secretRef:
+                name: rabbitmq-secrets
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            tcpSocket:
+              port: 5672
+            failureThreshold: 30
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 5672
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10

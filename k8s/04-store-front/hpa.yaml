@@ -1,0 +1,26 @@
+# HORIZONTAL POD AUTOSCALER: agrega/quita PODS según el uso de CPU
+# (métricas del metrics-server que AKS trae instalado).
+# Si los pods nuevos no caben en los nodos, el Cluster Autoscaler agrega NODOS.
+#   kubectl get hpa -n aks-store -w
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: store-front
+  namespace: aks-store
+  labels:
+    app: store-front
+    app.kubernetes.io/part-of: aks-store
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: store-front
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

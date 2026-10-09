@@ -1,0 +1,21 @@
+# Copia este archivo como terraform.tfvars y ajusta los valores.
+#   cp terraform.tfvars.example terraform.tfvars
+# Obtén tu subscription id con:  az account show --query id -o tsv
+
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "eastus2"
+prefix          = "sdaks"
+environment     = "demo"
+
+system_node_vm_size = "Standard_D2s_v5"
+system_node_count   = 1
+
+user_node_vm_size   = "Standard_D2s_v5"
+user_node_min_count = 1
+user_node_max_count = 3
+
+acr_sku = "Standard"
+
+tags = {
+  owner = "tu-nombre"
+}

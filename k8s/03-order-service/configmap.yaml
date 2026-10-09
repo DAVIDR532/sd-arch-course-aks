@@ -1,0 +1,15 @@
+# CONFIGMAP: configuración NO sensible, separada de la imagen.
+# La misma imagen sirve para dev/qa/prod cambiando solo el ConfigMap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-configs
+  namespace: aks-store
+  labels:
+    app: order-service
+    app.kubernetes.io/part-of: aks-store
+data:
+  ORDER_QUEUE_HOSTNAME: "rabbitmq"
+  ORDER_QUEUE_PORT: "5672"
+  ORDER_QUEUE_NAME: "orders"
+  FASTIFY_ADDRESS: "0.0.0.0"

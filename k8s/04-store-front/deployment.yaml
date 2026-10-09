@@ -1,0 +1,87 @@
+# store-front (Vue + nginx): la tienda web que ve el cliente.
+# nginx hace de reverse proxy:  /api/products -> product-service:3002
+#                               /api/orders   -> order-service:3000
+#
+# PERSONALIZACIÓN (paso 6 de la guía): cambia la etiqueta de la imagen a
+#   __ACR_LOGIN_SERVER__/aks-store-demo/store-front:2.2.0-smartdata
+# y vuelve a aplicar este archivo -> rolling update sin downtime.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-front
+  namespace: aks-store
+  labels:
+    app: store-front
+    app.kubernetes.io/part-of: aks-store
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 2
+  # Rolling update: sube 1 pod nuevo antes de bajar uno viejo -> cero downtime.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: store-front
+  template:
+    metadata:
+      labels:
+        app: store-front
+        app.kubernetes.io/part-of: aks-store
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      # Reparte las réplicas entre nodos distintos cuando sea posible (HA).
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: store-front
+      containers:
+        - name: store-front
+          image: __ACR_LOGIN_SERVER__/aks-store-demo/store-front:2.2.0
+          ports:
+            - containerPort: 8080
+              name: store-front
+          # Apagado elegante: al terminar un pod, Kubernetes lo saca del Service
+          # en paralelo con la señal de apagado. Esperar unos segundos antes de
+          # detener nginx evita que el Load Balancer le envíe peticiones a un pod
+          # que ya cerró (sin esto se observan errores puntuales en cada rollout).
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 10
+          resources:
+            # Personalizado: el original pide 1m de CPU; subimos a 50m para que
+            # el HPA calcule un % de uso realista (ver hpa.yaml).
+            requests:
+              cpu: 50m
+              memory: 200Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 5
+            initialDelaySeconds: 3
+            periodSeconds: 3

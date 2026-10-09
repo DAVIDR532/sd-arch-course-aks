@@ -1,0 +1,28 @@
+# NETWORK POLICY: firewall a nivel de pod (lo aplica Cilium en AKS).
+# Por defecto en Kubernetes TODOS los pods pueden hablar con TODOS.
+# Al seleccionar un pod con una política de Ingress, solo entra lo permitido.
+#
+# RabbitMQ solo acepta conexiones de quien publica (order-service)
+# y de quien consume (makeline-service).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rabbitmq-allow-producers-consumers
+  namespace: aks-store
+spec:
+  podSelector:
+    matchLabels:
+      app: rabbitmq
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: order-service
+        - podSelector:
+            matchLabels:
+              app: makeline-service
+      ports:
+        - protocol: TCP
+          port: 5672

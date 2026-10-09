@@ -1,0 +1,16 @@
+# RESOURCEQUOTA: tope de recursos que puede consumir TODO el namespace.
+# Visión de arquitecto: evita que un equipo/app se coma el cluster (multi-tenancy).
+# Ver consumo:  kubectl describe resourcequota -n aks-store
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: aks-store-quota
+  namespace: aks-store
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+    pods: "30"
+    services.loadbalancers: "2"

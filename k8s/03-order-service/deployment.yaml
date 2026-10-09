@@ -1,0 +1,81 @@
+# order-service (Node.js/Fastify): recibe pedidos (POST /) y los publica
+# en la cola "orders" de RabbitMQ -> patrón asíncrono / desacoplado.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: aks-store
+  labels:
+    app: order-service
+    app.kubernetes.io/part-of: aks-store
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+        app.kubernetes.io/part-of: aks-store
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      # INIT CONTAINER: corre ANTES del contenedor principal y debe terminar OK.
+      # Aquí espera a que RabbitMQ acepte conexiones (orden de dependencias).
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: __ACR_LOGIN_SERVER__/library/busybox:1.37.0
+          command:
+            ["sh", "-c", "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;"]
+          resources:
+            requests:
+              cpu: 1m
+              memory: 50Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+      containers:
+        - name: order-service
+          image: __ACR_LOGIN_SERVER__/aks-store-demo/order-service:2.2.0
+          ports:
+            - containerPort: 3000
+          # Variables de entorno inyectadas desde ConfigMap + Secret
+          envFrom:
+            - configMapRef:
+                name: order-service-configs
+            - secretRef:
+                name: order-service-secrets
+          resources:
+            requests:
+              cpu: 1m
+              memory: 50Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          # PROBES:
+          #  startup   -> ¿ya arrancó? (protege apps lentas al iniciar)
+          #  readiness -> ¿puede recibir tráfico? (si falla, sale del Service)
+          #  liveness  -> ¿sigue vivo? (si falla, kubelet reinicia el contenedor)
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            failureThreshold: 5
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            failureThreshold: 5
+            initialDelaySeconds: 3
+            periodSeconds: 3

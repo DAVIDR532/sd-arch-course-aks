@@ -1,0 +1,23 @@
+# product-service solo es accesible desde los frontends (store-front / store-admin).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: product-service-allow-frontends
+  namespace: aks-store
+spec:
+  podSelector:
+    matchLabels:
+      app: product-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: store-front
+        - podSelector:
+            matchLabels:
+              app: store-admin
+      ports:
+        - protocol: TCP
+          port: 3002

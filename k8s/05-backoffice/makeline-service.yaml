@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: makeline-service
+  namespace: aks-store
+  labels:
+    app: makeline-service
+    app.kubernetes.io/part-of: aks-store
+spec:
+  type: ClusterIP
+  selector:
+    app: makeline-service
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001

@@ -1,0 +1,20 @@
+# La base de datos solo acepta conexiones de makeline-service.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: documentdb-allow-makeline
+  namespace: aks-store
+spec:
+  podSelector:
+    matchLabels:
+      app: documentdb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: makeline-service
+      ports:
+        - protocol: TCP
+          port: 10260

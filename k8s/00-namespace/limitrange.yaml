@@ -1,0 +1,17 @@
+# LIMITRANGE: valores por defecto para contenedores que NO declaran
+# requests/limits. Con una ResourceQuota activa, un pod sin recursos sería
+# rechazado; el LimitRange se los asigna automáticamente.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: aks-store-defaults
+  namespace: aks-store
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
+      default:
+        cpu: 250m
+        memory: 256Mi
