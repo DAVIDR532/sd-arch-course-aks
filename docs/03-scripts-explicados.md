@@ -8,14 +8,14 @@ Kubernetes usa y muestra **cómo hacer lo mismo a mano**, sin el script.
 > `.ps1` (PowerShell 7: Windows, y también macOS/Linux si instalas `pwsh`) y `.sh` (Bash: macOS, Linux, WSL, Git Bash).
 > Se ejecutan **desde la raíz del repositorio**, aunque internamente resuelven las rutas desde su propia ubicación.
 
-| Script | Para qué | Servicio / concepto | Paso de la guía |
+| Script | Para qué | Servicio / concepto | Parte de la [guía](../GUIA-LABORATORIO.md) |
 |---|---|---|---|
 | [`_common`](#_common--utilidades-compartidas) | Funciones compartidas | Outputs de Terraform | (lo usan todos) |
-| [`k8s-apply`](#k8s-apply--aplicar-yamls-con-el-acr-correcto) | Aplicar YAMLs | `kubectl apply`, modelo declarativo | 4, 5, 6 |
-| [`01-import-images`](#01-import-images--llevar-las-imágenes-al-acr) | Copiar imágenes al ACR | ACR Import | 3 |
-| [`02-build-storefront`](#02-build-storefront--construir-una-imagen-personalizada-en-azure) | Construir imagen propia | ACR Tasks (build en la nube) | 6 |
-| [`03-deploy-app`](#03-deploy-app--desplegar-todo-en-orden) | Desplegar todo de una vez | Orden de dependencias, `rollout status` | atajo de 4-5 |
-| [`04-validate`](#04-validate--prueba-punto-a-punto) | Prueba punto a punto | Services, DNS, colas, NetworkPolicy | 7 |
+| [`k8s-apply`](#k8s-apply--aplicar-yamls-con-el-acr-correcto) | Aplicar YAMLs | `kubectl apply`, modelo declarativo | 5, 6, 7, 9 |
+| [`01-import-images`](#01-import-images--llevar-las-imágenes-al-acr) | Copiar imágenes al ACR | ACR Import | 4 |
+| [`02-build-storefront`](#02-build-storefront--construir-una-imagen-personalizada-en-azure) | Construir imagen propia | ACR Tasks (build en la nube) | 8 |
+| [`03-deploy-app`](#03-deploy-app--desplegar-todo-en-orden) | Desplegar todo de una vez | Orden de dependencias, `rollout status` | atajo de 5-7 |
+| [`04-validate`](#04-validate--prueba-punto-a-punto) | Prueba punto a punto | Services, DNS, colas, NetworkPolicy | 10 |
 
 ---
 
