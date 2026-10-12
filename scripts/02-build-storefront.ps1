@@ -25,6 +25,13 @@ Write-Step "Clonando aks-store-demo (tag 2.2.0)"
 git -c advice.detachedHead=false clone --quiet --depth 1 --branch 2.2.0 https://github.com/Azure-Samples/aks-store-demo.git $workDir
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo clonar el repositorio.' }
 
+# Un tag de Git se puede mover; verificamos el commit exacto para construir siempre el mismo código.
+$expectedCommit = 'fca8fe76b1763e1375f739d345f38c102bb39b96'
+$actualCommit = git -C $workDir rev-parse HEAD
+if ($actualCommit -ne $expectedCommit) {
+    throw "El tag 2.2.0 apunta a $actualCommit y se esperaba $expectedCommit. Se detiene el build por seguridad."
+}
+
 $storeFront = Join-Path $workDir 'src/store-front'
 
 function Update-File([string]$Path, [string]$Find, [string]$Replace) {

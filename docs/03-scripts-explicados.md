@@ -165,6 +165,10 @@ git clone --depth 1 --branch 2.2.0 https://github.com/Azure-Samples/aks-store-de
 `--branch 2.2.0` asegura que el código coincide con las imágenes `2.2.0` que ya usamos. `--depth 1` descarga solo
 la última versión, sin el historial. Se clona en una **carpeta temporal** que se borra al final.
 
+Después del clon, el script **verifica el commit exacto** (`fca8fe76…`) al que apunta el tag. En Git un tag se puede
+mover; si alguien lo cambiara, el script se detiene en vez de compilar código distinto. Es una práctica básica de
+**seguridad de la cadena de suministro**: saber exactamente qué código se está construyendo.
+
 **2. Aplica la personalización** (reemplazos de texto en el código Vue)
 
 | Archivo | Cambio |

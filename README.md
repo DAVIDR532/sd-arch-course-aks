@@ -25,6 +25,8 @@ y la validamos de punto a punto.
 7. [Cómo hacer el laboratorio](#7-cómo-hacer-el-laboratorio)
 8. [Troubleshooting](#8-troubleshooting)
 9. [Material de apoyo](#9-material-de-apoyo)
+10. [Seguridad de este demo](#10-seguridad-de-este-demo)
+11. [Créditos y licencia](#11-créditos-y-licencia)
 
 ---
 
@@ -244,3 +246,37 @@ Problemas reales que aparecieron al preparar el demo:
 - Tutorial original de Microsoft: <https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app>
 - Código fuente de la app: <https://github.com/Azure-Samples/aks-store-demo>
 - Buenas prácticas de AKS: <https://learn.microsoft.com/en-us/azure/aks/best-practices>
+
+## 10. Seguridad de este demo
+
+Este repositorio es **material de enseñanza**. Para que el laboratorio sea simple, algunas decisiones son deliberadamente
+inseguras; **no lo uses tal cual en producción**.
+
+| Aspecto | En este demo | Riesgo | En producción |
+|---|---|---|---|
+| Credenciales de RabbitMQ y DocumentDB | `username` / `password` en Secrets versionados (valores del ejemplo de Microsoft) | Cualquiera con acceso al repo o al namespace las conoce | Azure Key Vault + Secrets Store CSI Driver, o Workload Identity hacia servicios PaaS |
+| Portal `store-admin` | IP pública **sin autenticación** | Cualquiera con la IP puede modificar pedidos y productos | LoadBalancer interno, Private Link/VPN o autenticación con Entra ID |
+| API server de AKS | Público, con cuentas locales | Quien obtenga el kubeconfig tiene control del cluster | Cluster privado o rangos IP autorizados + Entra ID + Azure RBAC, `local_account_disabled` |
+| Entrada HTTP | Service LoadBalancer sin TLS | Tráfico en texto plano | Ingress gestionado / Application Gateway for Containers con TLS y WAF |
+| Imágenes | Copiadas al ACR por **tag** | Un tag público puede cambiar entre importaciones | Fijar por **digest**, escanear con Defender for Containers y restringir registros con Azure Policy |
+| Estado de Terraform | Local (`infra/terraform.tfstate`, ignorado por Git) | Contiene datos sensibles, incluidas credenciales del cluster | Backend remoto en Storage Account con cifrado, bloqueo y acceso restringido |
+
+**Buenas prácticas incluidas:**
+- `terraform.tfvars`, `*.tfstate` y `tfplan` están en `.gitignore`: nunca se suben IDs de suscripción ni credenciales.
+- El ACR no tiene usuario administrador; AKS descarga imágenes con **managed identity** y el rol **AcrPull**.
+- Network Policies limitan quién puede hablar con RabbitMQ y la base de datos.
+- El build personalizado verifica el **commit exacto** del código fuente que compila.
+
+**Recomendaciones para quien hace el laboratorio:**
+- Usa una suscripción de laboratorio o pruebas, nunca una de producción.
+- No compartas las IPs públicas ni tu kubeconfig.
+- Ejecuta siempre la [limpieza](GUIA-LABORATORIO.md#parte-12--limpieza-obligatorio) al terminar.
+- Si encuentras un problema de seguridad en este repositorio, avísalo al autor en privado en lugar de abrir un issue público.
+
+## 11. Créditos y licencia
+
+- La aplicación de ejemplo y los manifiestos de Kubernetes de [k8s/](k8s/) están adaptados de
+  [Azure-Samples/aks-store-demo](https://github.com/Azure-Samples/aks-store-demo), publicado por Microsoft bajo
+  licencia [MIT](https://github.com/Azure-Samples/aks-store-demo/blob/main/LICENSE.md)
+  (Copyright (c) Microsoft Corporation). Las imágenes de contenedor de la tienda son las publicadas por ese proyecto.
+- La infraestructura, los scripts, la guía y la documentación son material del curso de Arquitectos Azure (SmartData · AZ-305).

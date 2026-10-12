@@ -18,6 +18,14 @@ git -c advice.detachedHead=false clone --quiet --depth 1 --branch 2.2.0 \
   https://github.com/Azure-Samples/aks-store-demo.git "$work_dir/aks-store-demo"
 store_front="$work_dir/aks-store-demo/src/store-front"
 
+# Un tag de Git se puede mover; verificamos el commit exacto para construir siempre el mismo código.
+expected_commit="fca8fe76b1763e1375f739d345f38c102bb39b96"
+actual_commit="$(git -C "$work_dir/aks-store-demo" rev-parse HEAD)"
+if [ "$actual_commit" != "$expected_commit" ]; then
+  echo "El tag 2.2.0 apunta a $actual_commit y se esperaba $expected_commit. Se detiene el build por seguridad." >&2
+  exit 1
+fi
+
 # Reemplazo literal de texto (sin regex) que falla si no encuentra el texto original
 replace_in_file() {
   local file="$1" find="$2" replace="$3" content
@@ -50,7 +58,7 @@ status="$(az acr build \
   --build-arg "APP_VERSION=$TAG" \
   --no-logs --only-show-errors \
   --query status -o tsv \
-  "$store_front" | tr -d '\r')"
+  "$store_front" | tr -d '\r')" || status="error"
 if [ "$status" != "Succeeded" ]; then
   echo "Falló az acr build (estado: $status). Revisa: az acr task list-runs -r $acr_name -o table" >&2
   exit 1

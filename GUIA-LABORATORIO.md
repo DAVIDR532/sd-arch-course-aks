@@ -336,7 +336,7 @@ cat infra/terraform.tfvars
 📋 **Salida esperada:** la primera línea ya tiene tu Id (no ceros):
 
 ```
-subscription_id = "1fb70a14-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+subscription_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 location        = "eastus2"
 prefix          = "sdaks"
 ...
@@ -474,7 +474,7 @@ Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
 
 > 📘 [Teoría del punto 2.6](docs/teoria/parte-02-terraform.md#26-guardar-los-nombres-generados-en-variables)
 
-🔎 Los nombres llevan un sufijo aleatorio (por ejemplo `acrsdaksdemor5e01`). En lugar de copiarlos a mano,
+🔎 Los nombres llevan un sufijo aleatorio (por ejemplo `acrsdaksdemoab12c`). En lugar de copiarlos a mano,
 los guardamos en variables que usaremos el resto del laboratorio.
 
 🪟 **Windows (PowerShell 7)**
@@ -500,7 +500,7 @@ echo "ACR=$ACR  RG=$RG  AKS=$AKS"
 📋 **Salida esperada:**
 
 ```
-ACR=acrsdaksdemor5e01.azurecr.io  RG=rg-sdaks-demo-r5e01  AKS=aks-sdaks-demo-r5e01
+ACR=acrsdaksdemoab12c.azurecr.io  RG=rg-sdaks-demo-ab12c  AKS=aks-sdaks-demo-ab12c
 ```
 
 ### 2.7 Recorrido por el portal
@@ -541,7 +541,7 @@ az aks get-credentials --resource-group $RG --name $AKS --overwrite-existing
 📋 **Salida esperada:**
 
 ```
-Merged "aks-sdaks-demo-r5e01" as current context in /home/usuario/.kube/config
+Merged "aks-sdaks-demo-ab12c" as current context in /home/usuario/.kube/config
 ```
 
 ### 3.2 Ver los nodos
@@ -633,7 +633,7 @@ no necesitas Docker y la imagen no pasa por tu computador.
 📋 **Salida esperada** (al final):
 
 ```
-==> Importando ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.112.0 -> acrsdaksdemor5e01.azurecr.io/documentdb/documentdb-local:pg17-0.112.0
+==> Importando ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.112.0 -> acrsdaksdemoab12c.azurecr.io/documentdb/documentdb-local:pg17-0.112.0
 
 ==> Repositorios en el ACR
 Result
@@ -881,7 +881,7 @@ kubectl get svc store-front -n aks-store
 
 ```
 NAME          TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)        AGE
-store-front   LoadBalancer   10.0.110.188   20.161.209.142   80:32285/TCP   56s
+store-front   LoadBalancer   10.0.110.188   203.0.113.10   80:32285/TCP   56s
 ```
 
 ▶️ Guarda la IP en una variable:
@@ -1002,6 +1002,11 @@ echo "Portal admin: http://$ADMIN_IP"
 ```
 
 ▶️ Abre esa URL: en **Orders** verás los pedidos pendientes (los tuyos y los del simulador).
+
+> ⚠️ **Seguridad:** el portal admin queda **público y sin autenticación**: cualquiera que conozca la IP puede ver y
+> modificar pedidos y productos. Es aceptable solo para este laboratorio temporal. No compartas la IP y destruye
+> todo al terminar ([Parte 12](#parte-12--limpieza-obligatorio)). En producción sería interno o protegido con Entra ID
+> ([teoría](docs/teoria/parte-06-backoffice.md)).
 
 ▶️ Mira al simulador enviando pedidos (`Ctrl + C` para salir):
 
@@ -1150,7 +1155,7 @@ STORE_NAME="Tienda de TU-NOMBRE" BRAND_COLOR="#0b3d91" TAG="$MI_TAG" ./scripts/0
 📋 **Salida esperada** (al final):
 
 ```
-==> Compilando la imagen en ACR Tasks -> acrsdaksdemor5e01.azurecr.io/aks-store-demo/store-front:2.2.0-ana
+==> Compilando la imagen en ACR Tasks -> acrsdaksdemoab12c.azurecr.io/aks-store-demo/store-front:2.2.0-ana
 (compilando en Azure, ~1-2 min...)
 Build: Succeeded
 
@@ -1365,14 +1370,14 @@ kubectl rollout status deployment/store-front -n aks-store
 ```
 [OK] Pods listos - todos Ready
 [OK] Apps fuera del pool system - nodos usados: aks-apps-94602605-vmss000000
-[OK] Todas las imágenes vienen del ACR - acrsdaksdemor5e01.azurecr.io
-[OK] IP pública store-front - 20.161.209.142
+[OK] Todas las imágenes vienen del ACR - acrsdaksdemoab12c.azurecr.io
+[OK] IP pública store-front - 203.0.113.10
 [OK] GET /health (store-front) - version=2.2.0-ana
 [OK] GET / (página web) - title='Tienda de ana'
 [OK] GET /api/products - 10 productos (ej: Contoso Catnip's Friend)
 [OK] POST /api/orders - HTTP 201
 [OK] Cola "orders" en RabbitMQ - antes: [orders 0] después: [orders 0] (makeline-service consume la cola, puede quedar en 0)
-[OK] IP pública store-admin - 20.94.24.219
+[OK] IP pública store-admin - 203.0.113.20
 [OK] store-admin -> makeline -> DocumentDB - 2 pedidos pendientes leídos de la base de datos
 [OK] Pod no autorizado -> RabbitMQ bloqueado - BLOCKED
 ```
