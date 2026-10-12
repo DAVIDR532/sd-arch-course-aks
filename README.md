@@ -10,6 +10,7 @@ y la validamos de punto a punto.
 > ## ▶️ ¿Vas a hacer el laboratorio? Empieza aquí: **[GUIA-LABORATORIO.md](GUIA-LABORATORIO.md)**
 > Guía paso a paso para copiar y pegar, con comandos para Windows, macOS y Linux, salida esperada y checkpoints.
 > Este README es la visión general: objetivos, arquitectura y conceptos.
+> La explicación teórica de **cada paso** está en **[docs/teoria/](docs/teoria/README.md)**.
 
 ---
 
@@ -175,7 +176,8 @@ sd-arch-course-aks/                ◄── 📂 RAÍZ DEL REPO: todos los coma
 └── docs/
     ├── 01-intro-kubernetes.md
     ├── 02-aks-para-arquitectos.md
-    └── 03-scripts-explicados.md   ◄── qué hace cada script por dentro y cómo hacerlo a mano
+    ├── 03-scripts-explicados.md   ◄── qué hace cada script por dentro y cómo hacerlo a mano
+    └── teoria/                    ◄── explicación docente de cada paso de la guía (una página por Parte)
 ```
 
 > 🔧 Los YAML usan el marcador `__ACR_LOGIN_SERVER__` en las imágenes, porque el nombre del ACR es único por
@@ -237,6 +239,7 @@ Problemas reales que aparecieron al preparar el demo:
 - [01 · Mini intro a Kubernetes](docs/01-intro-kubernetes.md): arquitectura, objetos, labels, probes, chuleta de `kubectl`
 - [02 · AKS para arquitectos](docs/02-aks-para-arquitectos.md): responsabilidades, node pools, red, identidad, operación y checklist demo → producción
 - [Guía del laboratorio](GUIA-LABORATORIO.md): paso a paso para copiar y pegar
+- [Teoría del laboratorio](docs/teoria/README.md): explicación de cada paso, conceptos core de Azure y enlaces para aprender más
 - [03 · Los scripts, explicados](docs/03-scripts-explicados.md): qué hace cada script por dentro, su equivalente manual y un ejercicio propuesto
 - Tutorial original de Microsoft: <https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app>
 - Código fuente de la app: <https://github.com/Azure-Samples/aks-store-demo>

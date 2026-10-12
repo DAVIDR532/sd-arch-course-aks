@@ -27,7 +27,11 @@ funcionando en Azure Kubernetes Service, actualizada sin downtime y validada de 
 6. Si algo falla, mira el bloque **🆘 Si falla** del paso o la tabla de
    [Troubleshooting del README](README.md#8-troubleshooting).
 
-**Leyenda:** 🎯 qué vas a lograr · ▶️ ejecuta · 🔎 qué está pasando · 📋 salida esperada · ✅ checkpoint · 🆘 si falla · 📖 para profundizar
+7. ¿Quieres entender **por qué** funciona cada paso? Debajo de cada punto hay un enlace **📘 Teoría del punto X.Y**
+   con la explicación: teoría, qué pasó por dentro, conceptos core de Azure y dónde aprender más.
+   Índice completo: [docs/teoria/](docs/teoria/README.md).
+
+**Leyenda:** 🎯 qué vas a lograr · ▶️ ejecuta · 🔎 qué está pasando · 📋 salida esperada · ✅ checkpoint · 🆘 si falla · 📖 para profundizar · 📘 teoría del paso
 
 ---
 
@@ -53,9 +57,13 @@ funcionando en Azure Kubernetes Service, actualizada sin downtime y validada de 
 
 ## Parte 0 · Preparar tu equipo (una sola vez)
 
+> 📘 [Teoría de la Parte 0 (todos sus puntos)](docs/teoria/parte-00-preparar-equipo.md)
+
 🎯 Tener las herramientas instaladas y el repositorio descargado.
 
 ### 0.1 Abrir la terminal correcta
+
+> 📘 [Teoría del punto 0.1](docs/teoria/parte-00-preparar-equipo.md#01-abrir-la-terminal-correcta)
 
 | Sistema | Cómo abrirla |
 |---|---|
@@ -72,6 +80,8 @@ $PSVersionTable.PSVersion
 📋 Debe mostrar `Major` igual a **7**.
 
 ### 0.2 Instalar las herramientas
+
+> 📘 [Teoría del punto 0.2](docs/teoria/parte-00-preparar-equipo.md#02-instalar-las-herramientas)
 
 🪟 **Windows (PowerShell 7)**: copia el bloque completo. Al terminar, **cierra y vuelve a abrir** la terminal.
 
@@ -107,6 +117,8 @@ sudo apt-get update && sudo apt-get install -y terraform
 
 ### 0.3 Verificar las herramientas
 
+> 📘 [Teoría del punto 0.3](docs/teoria/parte-00-preparar-equipo.md#03-verificar-las-herramientas)
+
 ▶️ Igual en todos los sistemas:
 
 ```bash
@@ -129,6 +141,8 @@ git version 2.x.x
 "command not found", reinstálalo y **reabre la terminal**.
 
 ### 0.4 Descargar el repositorio
+
+> 📘 [Teoría del punto 0.4](docs/teoria/parte-00-preparar-equipo.md#04-descargar-el-repositorio)
 
 ▶️ Igual en todos los sistemas. Se descarga en tu carpeta personal:
 
@@ -160,6 +174,8 @@ docs  GUIA-LABORATORIO.md  infra  k8s  README.md  scripts
 
 ### 0.5 Permitir la ejecución de los scripts
 
+> 📘 [Teoría del punto 0.5](docs/teoria/parte-00-preparar-equipo.md#05-permitir-la-ejecución-de-los-scripts)
+
 🪟 **Windows (PowerShell 7)**: permite ejecutar scripts locales (solo para tu usuario):
 
 ```powershell
@@ -178,9 +194,13 @@ chmod +x scripts/*.sh
 
 ## Parte 1 · Conectarte a Azure
 
+> 📘 [Teoría de la Parte 1 (todos sus puntos)](docs/teoria/parte-01-conectarse-azure.md)
+
 🎯 Iniciar sesión, elegir la suscripción del laboratorio y confirmar que tiene lo necesario.
 
 ### 1.1 Iniciar sesión
+
+> 📘 [Teoría del punto 1.1](docs/teoria/parte-01-conectarse-azure.md#11-iniciar-sesión)
 
 ▶️ Igual en todos los sistemas:
 
@@ -196,6 +216,8 @@ escribe el **número** de la suscripción del laboratorio y presiona Enter.
 - Error `AADSTS50078 ... multi-factor authentication has expired`: usa `az login --tenant <id-del-tenant>`.
 
 ### 1.2 Elegir la suscripción del laboratorio
+
+> 📘 [Teoría del punto 1.2](docs/teoria/parte-01-conectarse-azure.md#12-elegir-la-suscripción-del-laboratorio)
 
 ▶️ Lista tus suscripciones:
 
@@ -218,6 +240,8 @@ az account show --query "{Suscripcion:name, Id:id, Usuario:user.name}" -o table
 ✅ **Checkpoint:** `Suscripcion` es la del laboratorio.
 
 ### 1.3 Registrar los proveedores de recursos
+
+> 📘 [Teoría del punto 1.3](docs/teoria/parte-01-conectarse-azure.md#13-registrar-los-proveedores-de-recursos)
 
 🔎 Una suscripción nueva no siempre tiene "activados" los servicios que vamos a usar. Esto los activa (si ya lo están, no pasa nada).
 
@@ -249,6 +273,8 @@ Microsoft.OperationsManagement  Registered
 
 ### 1.4 Verificar la cuota de máquinas virtuales
 
+> 📘 [Teoría del punto 1.4](docs/teoria/parte-01-conectarse-azure.md#14-verificar-la-cuota-de-máquinas-virtuales)
+
 🔎 El cluster usa 2 máquinas virtuales de 2 vCPU (puede crecer hasta 4). Necesitas cuota disponible en la región **eastus2**.
 
 🪟 **Windows (PowerShell 7)**
@@ -278,11 +304,15 @@ también. Si **DSv5 tiene límite 0** pero **DSv4** sí tiene cuota, no hay prob
 
 ## Parte 2 · Crear la infraestructura con Terraform
 
+> 📘 [Teoría de la Parte 2 (todos sus puntos)](docs/teoria/parte-02-terraform.md)
+
 🎯 Crear con código: Resource Group, Log Analytics, Azure Container Registry (ACR) y el cluster AKS con 2 node pools.
 
 📖 Qué crea cada recurso y por qué: [docs/02-aks-para-arquitectos.md](docs/02-aks-para-arquitectos.md) e [infra/main.tf](infra/main.tf).
 
 ### 2.1 Crear el archivo de variables
+
+> 📘 [Teoría del punto 2.1](docs/teoria/parte-02-terraform.md#21-crear-el-archivo-de-variables)
 
 🔎 Terraform lee los valores (suscripción, región, tamaños) desde `infra/terraform.tfvars`. Lo creamos a partir de la
 plantilla, poniendo automáticamente el Id de **tu** suscripción.
@@ -331,6 +361,8 @@ grep vm_size infra/terraform.tfvars
 
 ### 2.2 Indicarle a Terraform con qué cuenta trabajar
 
+> 📘 [Teoría del punto 2.2](docs/teoria/parte-02-terraform.md#22-indicarle-a-terraform-con-qué-cuenta-trabajar)
+
 🔎 Terraform usa la sesión de `az login`. Estas dos líneas evitan los dos errores más comunes: usar el tenant equivocado
 (si tienes varias organizaciones) o usar credenciales de un *service principal* guardadas en tu equipo.
 
@@ -352,6 +384,8 @@ unset ARM_CLIENT_ID ARM_CLIENT_SECRET ARM_SUBSCRIPTION_ID
 
 ### 2.3 Inicializar Terraform
 
+> 📘 [Teoría del punto 2.3](docs/teoria/parte-02-terraform.md#23-inicializar-terraform)
+
 ▶️ Igual en todos los sistemas:
 
 ```bash
@@ -368,6 +402,8 @@ Terraform has been successfully initialized!
 ```
 
 ### 2.4 Revisar el plan
+
+> 📘 [Teoría del punto 2.4](docs/teoria/parte-02-terraform.md#24-revisar-el-plan)
 
 ▶️ Igual en todos los sistemas:
 
@@ -403,6 +439,8 @@ Plan: 7 to add, 0 to change, 0 to destroy.
 
 ### 2.5 Crear la infraestructura
 
+> 📘 [Teoría del punto 2.5](docs/teoria/parte-02-terraform.md#25-crear-la-infraestructura)
+
 ▶️ Igual en todos los sistemas:
 
 ```bash
@@ -433,6 +471,8 @@ Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
 | `AuthorizationFailed` en `role_assignment` | Tu usuario necesita rol **Owner** en la suscripción: pídeselo al profesor |
 
 ### 2.6 Guardar los nombres generados en variables
+
+> 📘 [Teoría del punto 2.6](docs/teoria/parte-02-terraform.md#26-guardar-los-nombres-generados-en-variables)
 
 🔎 Los nombres llevan un sufijo aleatorio (por ejemplo `acrsdaksdemor5e01`). En lugar de copiarlos a mano,
 los guardamos en variables que usaremos el resto del laboratorio.
@@ -465,6 +505,8 @@ ACR=acrsdaksdemor5e01.azurecr.io  RG=rg-sdaks-demo-r5e01  AKS=aks-sdaks-demo-r5e
 
 ### 2.7 Recorrido por el portal
 
+> 📘 [Teoría del punto 2.7](docs/teoria/parte-02-terraform.md#27-recorrido-por-el-portal)
+
 Abre el [portal de Azure](https://portal.azure.com) y busca:
 
 | Dónde | Qué observar | Concepto |
@@ -480,9 +522,13 @@ Abre el [portal de Azure](https://portal.azure.com) y busca:
 
 ## Parte 3 · Conectar kubectl al cluster
 
+> 📘 [Teoría de la Parte 3 (todos sus puntos)](docs/teoria/parte-03-kubectl.md)
+
 🎯 Configurar `kubectl` para que hable con tu cluster y explorar sus nodos.
 
 ### 3.1 Descargar las credenciales
+
+> 📘 [Teoría del punto 3.1](docs/teoria/parte-03-kubectl.md#31-descargar-las-credenciales)
 
 ▶️ Igual en todos los sistemas (usa las variables del paso 2.6):
 
@@ -500,6 +546,8 @@ Merged "aks-sdaks-demo-r5e01" as current context in /home/usuario/.kube/config
 
 ### 3.2 Ver los nodos
 
+> 📘 [Teoría del punto 3.2](docs/teoria/parte-03-kubectl.md#32-ver-los-nodos)
+
 ```bash
 kubectl get nodes -L agentpool,workload
 ```
@@ -515,6 +563,8 @@ aks-system-22944399-vmss000000   Ready    <none>   3m    v1.35.8   system
 🔎 Cada nodo es una VM del Scale Set. La columna `WORKLOAD=apps` es una etiqueta que pusimos en Terraform.
 
 ### 3.3 Ver por qué las apps no caen en el nodo "system"
+
+> 📘 [Teoría del punto 3.3](docs/teoria/parte-03-kubectl.md#33-ver-por-qué-las-apps-no-caen-en-el-nodo-system)
 
 🪟 **Windows (PowerShell 7)**
 
@@ -539,6 +589,8 @@ Tus aplicaciones irán automáticamente al nodo `apps`.
 
 ### 3.4 Ver los componentes del sistema
 
+> 📘 [Teoría del punto 3.4](docs/teoria/parte-03-kubectl.md#34-ver-los-componentes-del-sistema)
+
 ```bash
 kubectl get pods -n kube-system
 ```
@@ -552,9 +604,13 @@ kubectl get pods -n kube-system
 
 ## Parte 4 · Copiar las imágenes al registro privado (ACR)
 
+> 📘 [Teoría de la Parte 4 (todos sus puntos)](docs/teoria/parte-04-acr.md)
+
 🎯 Que el cluster descargue las imágenes **solo de tu ACR**, no de registros públicos de internet.
 
 ### 4.1 Ejecutar la importación
+
+> 📘 [Teoría del punto 4.1](docs/teoria/parte-04-acr.md#41-ejecutar-la-importación)
 
 🪟 **Windows (PowerShell 7)**
 
@@ -602,6 +658,8 @@ library/rabbitmq
 
 ### 4.2 Verificar
 
+> 📘 [Teoría del punto 4.2](docs/teoria/parte-04-acr.md#42-verificar)
+
 ```bash
 az acr repository list --name $ACR_NAME -o table
 ```
@@ -612,6 +670,8 @@ az acr repository list --name $ACR_NAME -o table
 
 ## Parte 5 · Desplegar la tienda pieza por pieza
 
+> 📘 [Teoría de la Parte 5 (todos sus puntos)](docs/teoria/parte-05-tienda.md)
+
 🎯 Desplegar el núcleo de la tienda (el mismo escenario del tutorial de Microsoft) objeto por objeto, entendiendo cada uno.
 
 🔎 **Cómo aplicamos los YAML:** los archivos de `k8s/` tienen el marcador `__ACR_LOGIN_SERVER__` donde va el nombre de
@@ -619,6 +679,8 @@ tu ACR. El script `k8s-apply` lo reemplaza y ejecuta `kubectl apply`.
 📖 [Cómo funciona y cómo hacerlo sin el script](docs/03-scripts-explicados.md#k8s-apply--aplicar-yamls-con-el-acr-correcto).
 
 ### 5.1 Abrir una segunda terminal para observar (recomendado)
+
+> 📘 [Teoría del punto 5.1](docs/teoria/parte-05-tienda.md#51-abrir-una-segunda-terminal-para-observar-recomendado)
 
 Abre **otra** terminal (mismo tipo: PowerShell 7 o Bash), entra a la carpeta y deja corriendo:
 
@@ -632,6 +694,8 @@ kubectl get pods -n aks-store -w
 Para detenerla en cualquier momento: `Ctrl + C`.
 
 ### 5.2 Namespace, cuota y límites
+
+> 📘 [Teoría del punto 5.2](docs/teoria/parte-05-tienda.md#52-namespace-cuota-y-límites)
 
 🎯 Crear el espacio aislado `aks-store` con un tope de recursos.
 
@@ -682,6 +746,8 @@ services.loadbalancers  0     2
 
 ### 5.3 RabbitMQ (mensajería)
 
+> 📘 [Teoría del punto 5.3](docs/teoria/parte-05-tienda.md#53-rabbitmq-mensajería)
+
 🎯 Desplegar la cola de mensajes donde se publican los pedidos.
 
 🪟 **Windows (PowerShell 7)**
@@ -724,6 +790,8 @@ service/rabbitmq   ClusterIP   10.0.58.110   <none>        5672/TCP,15672/TCP   
 - El usuario y la contraseña vienen de un **Secret** ([secret.yaml](k8s/01-rabbitmq/secret.yaml)).
 
 ### 5.4 Product service y order service (APIs)
+
+> 📘 [Teoría del punto 5.4](docs/teoria/parte-05-tienda.md#54-product-service-y-order-service-apis)
 
 🎯 Desplegar el catálogo de productos y el servicio que recibe pedidos.
 
@@ -781,6 +849,8 @@ kubectl get endpoints product-service -n aks-store
 
 ### 5.5 Store front (la tienda web)
 
+> 📘 [Teoría del punto 5.5](docs/teoria/parte-05-tienda.md#55-store-front-la-tienda-web)
+
 🎯 Publicar la tienda en internet con una IP pública.
 
 🪟 **Windows (PowerShell 7)**
@@ -835,6 +905,8 @@ Búscala en el portal: resource group `rg-...-nodes` → aparece un nuevo recurs
 
 ### 5.6 Probar la tienda
 
+> 📘 [Teoría del punto 5.6](docs/teoria/parte-05-tienda.md#56-probar-la-tienda)
+
 ▶️ Abre la URL que mostró el paso anterior (`http://20.x.x.x`) en tu navegador y:
 
 1. Agrega 2 o 3 productos al carrito (**Add to Cart**).
@@ -873,6 +945,8 @@ Cuando termines, vuelve a la terminal y presiona `Ctrl + C`.
 ---
 
 ## Parte 6 · Desplegar el backoffice
+
+> 📘 [Teoría del punto 6](docs/teoria/parte-06-backoffice.md)
 
 🎯 Completar el flujo de negocio: un worker procesa los pedidos de la cola, los guarda en una base de datos y un
 portal administrativo permite verlos. Además, dos simuladores generan tráfico.
@@ -956,9 +1030,13 @@ kubectl exec -n aks-store rabbitmq-0 -- rabbitmqctl list_queues name messages
 
 ## Parte 7 · Aplicar Network Policies
 
+> 📘 [Teoría de la Parte 7 (todos sus puntos)](docs/teoria/parte-07-network-policies.md)
+
 🎯 Restringir qué pods pueden hablar con RabbitMQ, la base de datos y el catálogo (por defecto, **todos** pueden hablar con **todos**).
 
 ### 7.1 Probar ANTES de aplicar las políticas
+
+> 📘 [Teoría del punto 7.1](docs/teoria/parte-07-network-policies.md#71-probar-antes-de-aplicar-las-políticas)
 
 ▶️ Un pod "intruso" intenta conectarse a RabbitMQ:
 
@@ -982,6 +1060,8 @@ pod "intruso" deleted
 ```
 
 ### 7.2 Aplicar las políticas
+
+> 📘 [Teoría del punto 7.2](docs/teoria/parte-07-network-policies.md#72-aplicar-las-políticas)
 
 🪟 **Windows (PowerShell 7)**
 
@@ -1010,6 +1090,8 @@ rabbitmq-allow-producers-consumers   app=rabbitmq          5s
 
 ### 7.3 Probar DESPUÉS de aplicar las políticas
 
+> 📘 [Teoría del punto 7.3](docs/teoria/parte-07-network-policies.md#73-probar-después-de-aplicar-las-políticas)
+
 ▶️ Repite **exactamente** el comando del paso 7.1.
 
 📋 **Salida esperada:** ahora la conexión **se bloquea**:
@@ -1031,9 +1113,13 @@ tiene, así que Cilium descarta sus paquetes. Las políticas filtran por **etiqu
 
 ## Parte 8 · Construir tu versión personalizada de la tienda
 
+> 📘 [Teoría de la Parte 8 (todos sus puntos)](docs/teoria/parte-08-build.md)
+
 🎯 Cambiar el nombre y el color de la tienda y compilar una imagen nueva **en Azure** (ACR Tasks), sin Docker en tu equipo.
 
 ### 8.1 Compilar la imagen
+
+> 📘 [Teoría del punto 8.1](docs/teoria/parte-08-build.md#81-compilar-la-imagen)
 
 ▶️ Cambia `TU-NOMBRE` por tu nombre (sin espacios ni tildes), por ejemplo `TAG` = `2.2.0-ana`:
 
@@ -1083,9 +1169,13 @@ Result
 
 ## Parte 9 · Rolling update sin downtime y rollback
 
+> 📘 [Teoría de la Parte 9 (todos sus puntos)](docs/teoria/parte-09-rolling-update.md)
+
 🎯 Publicar tu versión mientras la tienda recibe tráfico, comprobar que **ninguna petición falla** y luego volver atrás.
 
 ### 9.1 Preparar el medidor de disponibilidad (segunda terminal)
+
+> 📘 [Teoría del punto 9.1](docs/teoria/parte-09-rolling-update.md#91-preparar-el-medidor-de-disponibilidad-segunda-terminal)
 
 ▶️ En la **segunda terminal**, detén el `watch` con `Ctrl + C` y pega el bloque de tu sistema. Consulta la versión de
 la tienda 5 veces por segundo; **déjalo corriendo**.
@@ -1113,6 +1203,8 @@ while true; do echo "$(date +%H:%M:%S)  $(curl -s -m 2 http://$IP/health || echo
 
 ### 9.2 Cambiar la imagen en el YAML
 
+> 📘 [Teoría del punto 9.2](docs/teoria/parte-09-rolling-update.md#92-cambiar-la-imagen-en-el-yaml)
+
 ▶️ Vuelve a la **primera terminal**. Este comando cambia la línea `image:` de
 [k8s/04-store-front/deployment.yaml](k8s/04-store-front/deployment.yaml) de `store-front:2.2.0` a tu tag:
 
@@ -1139,6 +1231,8 @@ grep "image:" k8s/04-store-front/deployment.yaml
 > También puedes hacer este cambio a mano: abre el archivo en tu editor, busca la línea `image:` y cambia el tag.
 
 ### 9.3 Aplicar el cambio (rolling update)
+
+> 📘 [Teoría del punto 9.3](docs/teoria/parte-09-rolling-update.md#93-aplicar-el-cambio-rolling-update)
 
 🪟 **Windows (PowerShell 7)**
 
@@ -1202,6 +1296,8 @@ store-front-7dd7c7cff5   2         2         2       1m
 
 ### 9.4 Rollback
 
+> 📘 [Teoría del punto 9.4](docs/teoria/parte-09-rolling-update.md#94-rollback)
+
 ▶️ Mira el historial y vuelve a la versión anterior (sigue observando la segunda terminal):
 
 ```bash
@@ -1220,6 +1316,8 @@ deployment "store-front" successfully rolled out
 👀 La segunda terminal vuelve a mostrar `2.2.0`, de nuevo sin errores. La tienda vuelve a "Contoso Pet Store".
 
 ### 9.5 Volver a tu versión y dejar el repositorio consistente
+
+> 📘 [Teoría del punto 9.5](docs/teoria/parte-09-rolling-update.md#95-volver-a-tu-versión-y-dejar-el-repositorio-consistente)
 
 🔎 `rollout undo` cambió el **cluster**, pero el YAML todavía dice tu tag. La buena práctica es que el archivo
 (el "estado deseado") coincida con lo que corre. Vuelve a aplicar el YAML para dejar tu versión publicada:
@@ -1245,6 +1343,8 @@ kubectl rollout status deployment/store-front -n aks-store
 ---
 
 ## Parte 10 · Validación punto a punto
+
+> 📘 [Teoría del punto 10](docs/teoria/parte-10-validacion.md)
 
 🎯 Comprobar automáticamente que toda la cadena funciona.
 
@@ -1287,9 +1387,13 @@ Si tienes tiempo, haz los experimentos; si no, ve directo a la [Parte 12](#parte
 
 ## Parte 11 · Experimentos (opcionales)
 
+> 📘 [Teoría de la Parte 11 (todos sus puntos)](docs/teoria/parte-11-experimentos.md)
+
 Cada experimento es independiente. Ten la segunda terminal con `kubectl get pods -n aks-store -w` para ver los efectos.
 
 ### 11.1 Auto-sanación: borrar pods
+
+> 📘 [Teoría del punto 11.1](docs/teoria/parte-11-experimentos.md#111-auto-sanación-borrar-pods)
 
 ```bash
 kubectl delete pod -n aks-store -l app=product-service
@@ -1300,6 +1404,8 @@ kubectl get pods -n aks-store -l app=product-service
 La tienda sigue funcionando.
 
 ### 11.2 Escalado manual
+
+> 📘 [Teoría del punto 11.2](docs/teoria/parte-11-experimentos.md#112-escalado-manual)
 
 ```bash
 kubectl scale deployment/order-service --replicas=4 -n aks-store
@@ -1314,6 +1420,8 @@ kubectl scale deployment/order-service --replicas=2 -n aks-store
 ```
 
 ### 11.3 La cuota en acción
+
+> 📘 [Teoría del punto 11.3](docs/teoria/parte-11-experimentos.md#113-la-cuota-en-acción)
 
 ```bash
 kubectl scale deployment/order-service --replicas=40 -n aks-store
@@ -1334,6 +1442,8 @@ kubectl scale deployment/order-service --replicas=2 -n aks-store
 ```
 
 ### 11.4 Autoescalado (HPA)
+
+> 📘 [Teoría del punto 11.4](docs/teoria/parte-11-experimentos.md#114-autoescalado-hpa)
 
 ▶️ Mira el estado del autoescalador (`cpu: 2%/60%` significa: uso actual / objetivo):
 
@@ -1382,6 +1492,8 @@ los pods nuevos tardan en reportar métricas.
 
 ### 11.5 DNS interno (service discovery)
 
+> 📘 [Teoría del punto 11.5](docs/teoria/parte-11-experimentos.md#115-dns-interno-service-discovery)
+
 ```bash
 kubectl run dns -n aks-store --rm -i --restart=Never --image="$ACR/library/busybox:1.37.0" -- nslookup order-service
 ```
@@ -1389,6 +1501,8 @@ kubectl run dns -n aks-store --rm -i --restart=Never --image="$ACR/library/busyb
 📋 Resuelve `order-service.aks-store.svc.cluster.local` a una IP `10.0.x.x`: la IP del Service, no la de un pod.
 
 ### 11.6 Diagnóstico: una imagen que no existe
+
+> 📘 [Teoría del punto 11.6](docs/teoria/parte-11-experimentos.md#116-diagnóstico-una-imagen-que-no-existe)
 
 ```bash
 kubectl run roto -n aks-store --image="$ACR/no/existe:1"
@@ -1405,6 +1519,8 @@ kubectl delete pod roto -n aks-store
 
 ### 11.7 Monitoreo con Container Insights
 
+> 📘 [Teoría del punto 11.7](docs/teoria/parte-11-experimentos.md#117-monitoreo-con-container-insights)
+
 Portal de Azure → tu cluster AKS → **Monitoring → Insights** → pestañas **Nodes**, **Controllers** y **Containers**.
 Busca `store-front` y mira su CPU durante el experimento 11.4.
 
@@ -1412,9 +1528,13 @@ Busca `store-front` y mira su CPU durante el experimento 11.4.
 
 ## Parte 12 · Limpieza (obligatorio)
 
+> 📘 [Teoría de la Parte 12 (todos sus puntos)](docs/teoria/parte-12-limpieza.md)
+
 🎯 Eliminar **todos** los recursos para no seguir pagando.
 
 ### 12.1 Borrar la aplicación
+
+> 📘 [Teoría del punto 12.1](docs/teoria/parte-12-limpieza.md#121-borrar-la-aplicación)
 
 ▶️ Libera las IPs públicas y el Load Balancer de forma ordenada (~1-2 min):
 
@@ -1423,6 +1543,8 @@ kubectl delete namespace aks-store
 ```
 
 ### 12.2 Destruir la infraestructura
+
+> 📘 [Teoría del punto 12.2](docs/teoria/parte-12-limpieza.md#122-destruir-la-infraestructura)
 
 ▶️ Si abriste una terminal nueva, repite primero el [paso 2.2](#22-indicarle-a-terraform-con-qué-cuenta-trabajar). Luego:
 
@@ -1441,6 +1563,8 @@ Destroy complete! Resources: 7 destroyed.
 ```
 
 ### 12.3 Verificar que no quedó nada
+
+> 📘 [Teoría del punto 12.3](docs/teoria/parte-12-limpieza.md#123-verificar-que-no-quedó-nada)
 
 🪟 **Windows (PowerShell 7)**
 
